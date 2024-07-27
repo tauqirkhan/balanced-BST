@@ -6,7 +6,7 @@ function Tree(array) {
   const nonDuplicateArr = getNonDuplicateArr(array);
   //Sort array
   const sortedArray = mergeSort(nonDuplicateArr);
-  const root = buildTree(sortedArray, 0, sortedArray.length - 1);
+  let root = buildTree(sortedArray, 0, sortedArray.length - 1);
 
   function buildTree(arr, start, end) {
     if (start > end) return null;
@@ -17,6 +17,61 @@ function Tree(array) {
     node.left = buildTree(arr, start, mid - 1);
     node.right = buildTree(arr, mid + 1, end);
     return node;
+  }
+
+  function insert(value) {
+    root = insertRec(root, value);
+  }
+
+  function insertRec(root, value) {
+    if (root === null) {
+      return Node(value);
+    }
+
+    if (value < root.data) {
+      root.left = insertRec(root.left, value);
+    } else if (value > root.data) {
+      root.right = insertRec(root.right, value);
+    }
+    return root;
+  }
+
+  function deleteValue(value) {
+    root = deleteRec(root, value);
+  }
+
+  function deleteRec(root, value) {
+    if (root === null) {
+      return root;
+    }
+
+    if (value < root.data) {
+      root.left = deleteRec(root.left, value);
+    } else if (value > root.data) {
+      root.right = deleteRec(root.right, value);
+    } else {
+      //Root with only one child or no child
+      if (root.left === null) {
+        return root.right;
+      } else if (root.right === null) {
+        return root.left;
+      }
+
+      //root with two children : get the inorder successor
+      root.data = minValue(root.right);
+      //Delete the inorder successor
+      root.right = deleteRec(root.right, root.data);
+    }
+    return root;
+  }
+
+  function minValue(node) {
+    let minV = node.data;
+    while (node.left !== null) {
+      minV = node.left.data;
+      node = node.left;
+    }
+    return minV;
   }
 
   function getNonDuplicateArr(array) {
@@ -42,10 +97,10 @@ function Tree(array) {
     }
   }
 
-  return { root, prettyPrint };
+  return { root, prettyPrint, insert, deleteValue };
 }
 
 const arr = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
 const tree = Tree(arr);
-console.log(tree.root);
+tree.deleteValue(1);
 tree.prettyPrint(tree.root);
