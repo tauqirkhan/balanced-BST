@@ -6,7 +6,7 @@ function Tree(array) {
   const nonDuplicateArr = getNonDuplicateArr(array);
   //Sort array
   const sortedArray = mergeSort(nonDuplicateArr);
-  let root = buildTree(sortedArray, 0, sortedArray.length - 1);
+  let _root = buildTree(sortedArray, 0, sortedArray.length - 1);
 
   function buildTree(arr, start, end) {
     if (start > end) return null;
@@ -20,7 +20,7 @@ function Tree(array) {
   }
 
   function insert(value) {
-    root = insertRec(root, value);
+    _root = insertRec(_root, value);
   }
 
   function insertRec(root, value) {
@@ -37,7 +37,7 @@ function Tree(array) {
   }
 
   function deleteValue(value) {
-    root = deleteRec(root, value);
+    _root = deleteRec(_root, value);
   }
 
   function deleteRec(root, value) {
@@ -65,6 +65,35 @@ function Tree(array) {
     return root;
   }
 
+  function find(value) {
+    let node = _root;
+    while (node) {
+      if (node.data === value) {
+        return node;
+      }
+
+      if (value > node.data) {
+        node = node.right;
+      } else {
+        node = node.left;
+      }
+    }
+    return "Not found";
+  }
+
+  function prettyPrint(node = _root, prefix = "", isLeft = true) {
+    if (node === null) {
+      return;
+    }
+    if (node.right !== null) {
+      prettyPrint(node.right, `${prefix}${isLeft ? "│   " : "    "}`, false);
+    }
+    console.log(`${prefix}${isLeft ? "└── " : "┌── "}${node.data}`);
+    if (node.left !== null) {
+      prettyPrint(node.left, `${prefix}${isLeft ? "    " : "│   "}`, true);
+    }
+  }
+
   function minValue(node) {
     let minV = node.data;
     while (node.left !== null) {
@@ -84,23 +113,11 @@ function Tree(array) {
     return uniqueArr;
   }
 
-  function prettyPrint(node, prefix = "", isLeft = true) {
-    if (node === null) {
-      return;
-    }
-    if (node.right !== null) {
-      prettyPrint(node.right, `${prefix}${isLeft ? "│   " : "    "}`, false);
-    }
-    console.log(`${prefix}${isLeft ? "└── " : "┌── "}${node.data}`);
-    if (node.left !== null) {
-      prettyPrint(node.left, `${prefix}${isLeft ? "    " : "│   "}`, true);
-    }
-  }
-
-  return { root, prettyPrint, insert, deleteValue };
+  return { prettyPrint, insert, deleteValue, find };
 }
 
 const arr = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
 const tree = Tree(arr);
 tree.deleteValue(1);
-tree.prettyPrint(tree.root);
+tree.prettyPrint();
+console.log(tree.find(5));
