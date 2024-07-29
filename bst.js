@@ -81,6 +81,50 @@ function Tree(array) {
     return "Not found";
   }
 
+  function levelOrder(callback) {
+    let node = _root;
+
+    if (!node) return;
+    if (!callback) throw new Error("Callback is required");
+
+    let queue = [node];
+
+    while (queue.length !== 0) {
+      let current = queue.shift();
+      current.data = callback(current.data);
+
+      if (current.left !== null) {
+        queue.push(current.left);
+      }
+      if (current.right !== null) {
+        queue.push(current.right);
+      }
+    }
+    prettyPrint(node);
+  }
+
+  function levelOrderWithRec(callback) {
+    let node = _root;
+    levelOrderRec(node, callback);
+    prettyPrint(_root);
+  }
+
+  function levelOrderRec(node, callback) {
+    let pointer = node;
+
+    if (!callback) throw new Error("callback is required");
+    if (pointer === null) return;
+
+    pointer.data = callback(pointer.data);
+
+    if (node.left !== null) {
+      levelOrderRec(node.left, callback);
+    }
+    if (node.right !== null) {
+      levelOrderRec(node.right, callback);
+    }
+  }
+
   function prettyPrint(node = _root, prefix = "", isLeft = true) {
     if (node === null) {
       return;
@@ -113,11 +157,17 @@ function Tree(array) {
     return uniqueArr;
   }
 
-  return { prettyPrint, insert, deleteValue, find };
+  return {
+    prettyPrint,
+    insert,
+    deleteValue,
+    find,
+    levelOrder,
+    levelOrderWithRec,
+  };
 }
 
 const arr = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
 const tree = Tree(arr);
-tree.deleteValue(1);
-tree.prettyPrint();
-console.log(tree.find(5));
+tree.levelOrder((data) => (data = data * 1));
+tree.levelOrderWithRec((data) => (data = data * 2));
