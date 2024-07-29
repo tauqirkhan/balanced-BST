@@ -56,7 +56,6 @@ function Tree(array) {
       } else if (root.right === null) {
         return root.left;
       }
-
       //root with two children : get the inorder successor
       root.data = minValue(root.right);
       //Delete the inorder successor
@@ -178,6 +177,37 @@ function Tree(array) {
     }
   }
 
+  function height(node) {
+    //   // Base case: If the node is null, the height is -1
+    if (!node) return -1;
+
+    // Recursively get the height of the left subtree
+    let leftHeight = height(node.left);
+
+    // Recursively get the height of the right subtree
+    let rightHeight = height(node.right);
+
+    // The height of the node is the maximum of the heights of the subtrees, plus 1
+    return Math.max(leftHeight, rightHeight) + 1;
+  }
+
+  function depth(target) {
+    let node = _root;
+    return depthHelper(node, target, 0);
+  }
+
+  function depthHelper(node, target, depth) {
+    if (!node) return -1;
+
+    if (node === target) return depth;
+
+    let leftDepth = depthHelper(node.left, target, depth + 1);
+    if (leftDepth !== -1) return leftDepth;
+
+    let rightDepth = depthHelper(node.right, target, depth + 1);
+    return rightDepth;
+  }
+
   function prettyPrint(node = _root, prefix = "", isLeft = true) {
     if (node === null) {
       return;
@@ -220,11 +250,30 @@ function Tree(array) {
     inorder,
     postOrder,
     preOrder,
+    height,
+    depth,
   };
 }
 
 const arr = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
 const tree = Tree(arr);
 tree.prettyPrint();
-tree.preOrder((data) => (data = data * 2));
-tree.prettyPrint();
+let node = tree.find(9);
+console.log(tree.depth(node));
+// let node = tree.find(6345);
+// console.log(tree.height(node));
+
+/* let obj = {
+  data: 8,
+  left: {
+    data: 4,
+    left: { data: 1, left: null, right: 3 },
+    right: { data: 5, left: null, right: 7 },
+  },
+  right: {
+    data: 67,
+    left: { data: 9, left: null, right: 23 },
+    right: { data: 324, left: null, right: 6245 },
+  },
+};
+*/
