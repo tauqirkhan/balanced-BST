@@ -125,6 +125,59 @@ function Tree(array) {
     }
   }
 
+  function inorder(callback) {
+    let node = _root;
+    _inorderRec(node, callback, arr);
+  }
+
+  function preOrder(callback) {
+    let node = _root;
+    _preOrderRec(node, callback);
+  }
+
+  function postOrder(callback) {
+    let node = _root;
+    _postOrderRec(node, callback);
+  }
+
+  function _postOrderRec(node, callback) {
+    if (!node) return;
+    if (!callback) throw new Error("callback is required");
+
+    //<left> <right> <root>
+    if (node.left) _postOrderRec(node.left, callback);
+    if (node.right) _postOrderRec(node.right, callback);
+    node.data = callback(node.data);
+  }
+
+  function _preOrderRec(node, callback) {
+    if (!node) return;
+    if (!callback) throw new Error("callback is required");
+
+    //<root> <left> <right>
+    node.data = callback(node.data);
+    if (node.left) _preOrderRec(node.left, callback);
+    if (node.right) _preOrderRec(node.right, callback);
+  }
+
+  function _inorderRec(node, callback) {
+    let pointer = node;
+
+    if (pointer === null) return;
+    if (!callback) throw new Error("callback is required");
+
+    //<left> <root> <right>
+    if (pointer.left !== null) {
+      _inorderRec(pointer.left, callback);
+    }
+
+    pointer.data = callback(pointer.data);
+
+    if (pointer.right !== null) {
+      _inorderRec(pointer.right, callback);
+    }
+  }
+
   function prettyPrint(node = _root, prefix = "", isLeft = true) {
     if (node === null) {
       return;
@@ -164,10 +217,14 @@ function Tree(array) {
     find,
     levelOrder,
     levelOrderWithRec,
+    inorder,
+    postOrder,
+    preOrder,
   };
 }
 
 const arr = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
 const tree = Tree(arr);
-tree.levelOrder((data) => (data = data * 1));
-tree.levelOrderWithRec((data) => (data = data * 2));
+tree.prettyPrint();
+tree.preOrder((data) => (data = data * 2));
+tree.prettyPrint();
