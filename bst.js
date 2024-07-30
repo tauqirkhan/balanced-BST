@@ -86,11 +86,12 @@ function Tree(array) {
     if (!node) return;
     if (!callback) throw new Error("Callback is required");
 
+    let inorderArray = [];
     let queue = [node];
 
     while (queue.length !== 0) {
       let current = queue.shift();
-      current.data = callback(current.data);
+      inorderArray.push(callback(current.data));
 
       if (current.left !== null) {
         queue.push(current.left);
@@ -99,67 +100,77 @@ function Tree(array) {
         queue.push(current.right);
       }
     }
-    prettyPrint(node);
+    return inorderArray;
   }
 
   function levelOrderWithRec(callback) {
     let node = _root;
-    levelOrderRec(node, callback);
-    prettyPrint(_root);
+
+    return levelOrderRec(node, callback);
   }
 
   function levelOrderRec(node, callback) {
-    let pointer = node;
-
     if (!callback) throw new Error("callback is required");
-    if (pointer === null) return;
 
-    pointer.data = callback(pointer.data);
+    const length = height(node);
+    const result = [];
 
-    if (node.left !== null) {
-      levelOrderRec(node.left, callback);
+    for (let level = 0; level <= length; level++) {
+      addLevelNodeToResult(node, level, result, callback);
     }
-    if (node.right !== null) {
-      levelOrderRec(node.right, callback);
+
+    return result;
+  }
+
+  function addLevelNodeToResult(node, level, result, callback) {
+    if (!node) return;
+    if (level === 0) result.push(callback(node.data));
+    else if (level > 0) {
+      addLevelNodeToResult(node.left, level - 1, result, callback);
+      addLevelNodeToResult(node.right, level - 1, result, callback);
     }
   }
 
-  function inorder(callback) {
+  function inOrder(callback) {
     let node = _root;
-    _inorderRec(node, callback, arr);
+    return _inorderRec(node, callback);
   }
 
   function preOrder(callback) {
     let node = _root;
-    _preOrderRec(node, callback);
+    return _preOrderRec(node, callback);
   }
 
   function postOrder(callback) {
     let node = _root;
-    _postOrderRec(node, callback);
+    return _postOrderRec(node, callback);
   }
 
-  function _postOrderRec(node, callback) {
+  function _postOrderRec(node, callback, postOrderArray = []) {
     if (!node) return;
     if (!callback) throw new Error("callback is required");
 
     //<left> <right> <root>
-    if (node.left) _postOrderRec(node.left, callback);
-    if (node.right) _postOrderRec(node.right, callback);
-    node.data = callback(node.data);
+    if (node.left) _postOrderRec(node.left, callback, postOrderArray);
+    if (node.right) _postOrderRec(node.right, callback, postOrderArray);
+    postOrderArray.push(callback(node.data));
+
+    return postOrderArray;
   }
 
-  function _preOrderRec(node, callback) {
+  function _preOrderRec(node, callback, result = []) {
     if (!node) return;
     if (!callback) throw new Error("callback is required");
 
     //<root> <left> <right>
-    node.data = callback(node.data);
-    if (node.left) _preOrderRec(node.left, callback);
-    if (node.right) _preOrderRec(node.right, callback);
+    result.push(callback(node.data));
+    if (node.left) _preOrderRec(node.left, callback, result);
+    if (node.right) _preOrderRec(node.right, callback, result);
+
+    return result;
   }
 
-  function _inorderRec(node, callback) {
+  function _inorderRec(node, callback, inOrderArray = []) {
     let pointer = node;
 
     if (pointer === null) return;
@@ -167,14 +178,16 @@ function Tree(array) {
 
     //<left> <root> <right>
     if (pointer.left !== null) {
-      _inorderRec(pointer.left, callback);
+      _inorderRec(pointer.left, callback, inOrderArray);
     }
 
-    pointer.data = callback(pointer.data);
+    inOrderArray.push(callback(pointer.data));
 
     if (pointer.right !== null) {
-      _inorderRec(pointer.right, callback);
+      _inorderRec(pointer.right, callback, inOrderArray);
     }
+
+    return inOrderArray;
   }
 
   function height(node) {
@@ -234,22 +247,13 @@ function Tree(array) {
     //Check if it's unbalanced
     if (isBalanced(_root)) return "Tree is balanced";
 
-    let node = _root;
-    //Convert every node into array
-    const newArray = [];
-    function addNum(node, callback) {
-      if (node === null) return;
+    //Convert every node into inorder array
+    const newArray = inOrder((data) => data);
 
-      if (node.left !== null) addNum(node.left, callback);
-      callback(node.data);
-      if (node.right !== null) addNum(node.right, callback);
-    }
-    addNum(node, (data) => newArray.push(data));
     //Call Tree function
     let balancedTree = buildTree(newArray, 0, newArray.length - 1);
     //Assign treeNode with this root
     _root = balancedTree;
-    prettyPrint(_root);
   }
 
   function prettyPrint(node = _root, prefix = "", isLeft = true) {
@@ -291,7 +295,7 @@ function Tree(array) {
     find,
     levelOrder,
     levelOrderWithRec,
-    inorder,
+    inOrder,
     postOrder,
     preOrder,
     height,
@@ -301,12 +305,4 @@ function Tree(array) {
   };
 }
 
-const arr = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
-const tree = Tree(arr);
-tree.insert(4322353);
-tree.insert(46);
-tree.insert(50);
-tree.prettyPrint();
-console.log(`Tree balanced? ${tree.isBalanced()}`);
-tree.rebalance();
-console.log(`Tree balanced? ${tree.isBalanced()}`);
+export { Tree };
