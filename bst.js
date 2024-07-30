@@ -178,7 +178,7 @@ function Tree(array) {
   }
 
   function height(node) {
-    //   // Base case: If the node is null, the height is -1
+    // Base case: If the node is null, the height is -1
     if (!node) return -1;
 
     // Recursively get the height of the left subtree
@@ -197,15 +197,37 @@ function Tree(array) {
   }
 
   function depthHelper(node, target, depth) {
+    //Target not found
     if (!node) return -1;
 
     if (node === target) return depth;
 
+    //Search in left subtree
     let leftDepth = depthHelper(node.left, target, depth + 1);
+    //Target found in left subtree
     if (leftDepth !== -1) return leftDepth;
 
+    //Search in right subtree
     let rightDepth = depthHelper(node.right, target, depth + 1);
+    //Return depth if target found in right subtree or -1 if not found
     return rightDepth;
+  }
+
+  function isBalanced(node = _root) {
+    function checkHeight(node) {
+      if (node === null) return 0;
+
+      let leftHeight = checkHeight(node.left);
+      if (leftHeight === -1) return -1;
+
+      let rightHeight = checkHeight(node.right);
+      if (rightHeight === -1) return -1;
+
+      if (Math.abs(leftHeight - rightHeight) > 1) return -1;
+
+      return Math.max(leftHeight, rightHeight) + 1;
+    }
+    return checkHeight(node) !== -1;
   }
 
   function prettyPrint(node = _root, prefix = "", isLeft = true) {
@@ -252,28 +274,11 @@ function Tree(array) {
     preOrder,
     height,
     depth,
+    isBalanced,
   };
 }
 
 const arr = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
 const tree = Tree(arr);
 tree.prettyPrint();
-let node = tree.find(9);
-console.log(tree.depth(node));
-// let node = tree.find(6345);
-// console.log(tree.height(node));
-
-/* let obj = {
-  data: 8,
-  left: {
-    data: 4,
-    left: { data: 1, left: null, right: 3 },
-    right: { data: 5, left: null, right: 7 },
-  },
-  right: {
-    data: 67,
-    left: { data: 9, left: null, right: 23 },
-    right: { data: 324, left: null, right: 6245 },
-  },
-};
-*/
+console.log(tree.isBalanced());
