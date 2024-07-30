@@ -230,6 +230,28 @@ function Tree(array) {
     return checkHeight(node) !== -1;
   }
 
+  function rebalance() {
+    //Check if it's unbalanced
+    if (isBalanced(_root)) return "Tree is balanced";
+
+    let node = _root;
+    //Convert every node into array
+    const newArray = [];
+    function addNum(node, callback) {
+      if (node === null) return;
+
+      if (node.left !== null) addNum(node.left, callback);
+      callback(node.data);
+      if (node.right !== null) addNum(node.right, callback);
+    }
+    addNum(node, (data) => newArray.push(data));
+    //Call Tree function
+    let balancedTree = buildTree(newArray, 0, newArray.length - 1);
+    //Assign treeNode with this root
+    _root = balancedTree;
+    prettyPrint(_root);
+  }
+
   function prettyPrint(node = _root, prefix = "", isLeft = true) {
     if (node === null) {
       return;
@@ -275,10 +297,16 @@ function Tree(array) {
     height,
     depth,
     isBalanced,
+    rebalance,
   };
 }
 
 const arr = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
 const tree = Tree(arr);
+tree.insert(4322353);
+tree.insert(46);
+tree.insert(50);
 tree.prettyPrint();
-console.log(tree.isBalanced());
+console.log(`Tree balanced? ${tree.isBalanced()}`);
+tree.rebalance();
+console.log(`Tree balanced? ${tree.isBalanced()}`);
